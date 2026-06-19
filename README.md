@@ -4,14 +4,31 @@ Adversarial-review and structured-thinking skills for [Claude Code](https://clau
 
 ## Skills
 
+**Code review**
+
+| Skill | What it does | When it fires |
+|-------|-------------|----------------|
+| **[paranoid-review](paranoid-review/SKILL.md)** | Adversarial code review across six lenses: hostile input, concurrency, partial failure, resource exhaustion, trust boundaries, observability gaps | "What could break?", edge cases on a diff |
+| **[cto-review-general](cto-review-general/SKILL.md)** | CTO-level adversarial review for high-stakes systems. Derives failure modes before reading the code, mandates a hand-trace per finding, and checks the *dual* of every prior fix to catch the symmetric bug a fix tends to introduce | High-stakes diffs — payments, auth, data pipelines, infra — especially iterative fix/review loops |
+| **[cto-review](cto-review/SKILL.md)** | Same framework, specialized for trading / quant code: P&L math, fills, positions, missing risk cases, domain-transfer failures | Reviewing trading-strategy code |
+
+**Decisions & thinking**
+
 | Skill | What it does | When it fires |
 |-------|-------------|----------------|
 | **[premortem](premortem/SKILL.md)** | Prospective failure analysis. Assume the change already failed; reverse-engineer the headline. | Before shipping a non-trivial change or committing to a decision |
-| **[paranoid-review](paranoid-review/SKILL.md)** | Adversarial code review across six lenses: hostile input, concurrency, partial failure, resource exhaustion, trust boundaries, observability gaps | "What could break?", edge cases on a diff |
 | **[mental-models](mental-models/SKILL.md)** | Munger-style lattice (inversion, second-order, opportunity cost, base rates, incentives, Goodhart, Hanlon, path dependence, etc.) | Strategic / business decisions — not code |
 | **[steelman](steelman/SKILL.md)** | Anti-sycophancy circuit-breaker. Forces genuine evaluation when the user pushes back, rather than capitulating to social pressure | Multi-turn pushback, "are you sure", proposed alternatives — fires proactively |
 
-These compose well: e.g. *"premortem this, then steelman the findings"* or *"apply mental models, then lateral-think any blind spots."*
+**Workflow**
+
+| Skill | What it does | When it fires |
+|-------|-------------|----------------|
+| **[planning-with-files](planning-with-files/SKILL.md)** | Manus-style persistent-markdown workflow — planning, progress, and knowledge stored on disk as working memory | Complex multi-step or long-running projects |
+
+**Why the review skills vs. a one-shot code review?** They force discipline a generic pass skips: derive the failure modes *before* reading the diff, attach a concrete hand-trace to every finding (no hand-trace = hypothesis, not a finding), check the *dual* of each previous fix, and declare an explicit stop condition instead of manufacturing round-N nitpicks.
+
+These compose well: e.g. *"premortem this, then steelman the findings"* or *"cto-review-general this diff, then paranoid-review the fix."*
 
 ## Install
 
@@ -22,12 +39,12 @@ git clone https://github.com/ogiberstein/claude-thinking-skills.git
 
 # Symlink each skill into ~/.claude/skills/ so Claude Code discovers them
 cd ~/.claude/skills
-for s in premortem paranoid-review mental-models steelman; do
+for s in paranoid-review cto-review-general cto-review premortem mental-models steelman planning-with-files; do
   ln -s claude-thinking-skills/$s $s
 done
 ```
 
-Verify by starting a new Claude Code session and checking that the 4 skills appear in the available-skills list.
+Verify by starting a new Claude Code session and checking that the 7 skills appear in the available-skills list.
 
 ## Design principles
 
